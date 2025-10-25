@@ -1,4 +1,4 @@
-#include ../includes/remap.glsl
+// #include ../includes/remap.glsl
 
 uniform float uTime;
 uniform float uSpeed;
@@ -25,6 +25,7 @@ void main(){
 
     gl_FragColor = vec4(col, d);
     // gl_FragColor = vec4(0.47, 0.33, 0.24, 1.0);
+    // gl_FragColor = vec4(1., .0, .0, 1.);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
 }

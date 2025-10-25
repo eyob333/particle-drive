@@ -1,8 +1,8 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import GUI from 'lil-gui'
-import fragmentShader from './shader/Particle/fragment.glsl?raw'
-import vertexShader from './shader/Particle/vertex.glsl?raw'
+import fragmentShader from './shader/Particle/fragment.glsl'
+import vertexShader from './shader/Particle/vertex.glsl'
 
 
 /**
@@ -46,9 +46,9 @@ window.addEventListener('resize', () => {
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(25, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 7
-camera.position.y = 7
-camera.position.z = 7
+camera.position.x = 0
+camera.position.y = 0
+camera.position.z = 5
 scene.add(camera)
 
 // Controls
@@ -81,13 +81,13 @@ params.color = '#619ae5'
 
 let uniforms = {}
 uniforms.uTime = new THREE.Uniform(0)
-uniforms.uSpeed = new THREE.Uniform(.001)
+uniforms.uSpeed = new THREE.Uniform(.1)
 uniforms.uSize = new THREE.Uniform(35.)
 uniforms.uResolution = new THREE.Uniform(new THREE.Vector2(sizes.width, sizes.height))
 uniforms.uColor = new THREE.Uniform(new THREE.Color(params.color))
 
 
-let geometry = new THREE.BufferGeometry();
+const geometry = new THREE.BufferGeometry();
 const position = new Float32Array(params.count * 3);
 const speed = new Float32Array(params.count)
 
@@ -119,10 +119,10 @@ for (let i = 0; i < params.count; i++) {
 geometry.setAttribute('position', new THREE.BufferAttribute(position, 3))
 geometry.setAttribute('aSpeed', new THREE.BufferAttribute(speed, 1))
 
-let material = new THREE.ShaderMaterial({
+const material = new THREE.ShaderMaterial({
     vertexShader: vertexShader,
     fragmentShader: fragmentShader,
-    uniforms: uniforms,
+    uniforms,
     transparent: true,
     wireframe: false,
     blending: THREE.AdditiveBlending,
@@ -132,20 +132,18 @@ let material = new THREE.ShaderMaterial({
 });
 
 let particles = new THREE.Points(geometry, material);
-particles.position.set(-4, 4, 0)
+particles.position.set(0, 0, 70)
 particles.frustumCulled = false
 scene.add(particles)
 
 
+//text mesh
+const box = new THREE.Mesh( new THREE.BoxGeometry, new THREE.MeshBasicMaterial({color: 0xffffff}))
+// scene.add(box)
 
 
 
-
-
-
-// gui.add(params, 'count').min(10).max(100000).step(1).name('count').onFinishChange(() => {
-//     this.setAttr()
-// })
+gui.add(params, 'count').min(10).max(100000).step(1).name('count')
 gui.add(params, 'outerRad').min(0).max(1.).step(.001).name('outerRadius')
 gui.add(params, 'innerVoidRad').min(0).max(1.).step(.001).name('VoidRadius')
 gui.add(uniforms.uSpeed, 'value').min(0).max(3).step(0.0001).name('uSpeed')
@@ -155,7 +153,6 @@ gui.addColor(params, 'color').onChange(() => {
 }).name('uColor')
 gui.add(material, 'wireframe').name('wireframe')
 gui.add(material, 'transparent').name('transparent')
-
 
 
 
