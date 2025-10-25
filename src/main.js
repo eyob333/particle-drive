@@ -1,6 +1,10 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import GUI from 'lil-gui'
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import fragmentShader from './shader/Particle/fragment.glsl'
 import vertexShader from './shader/Particle/vertex.glsl'
 
@@ -39,6 +43,7 @@ window.addEventListener('resize', () => {
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(sizes.pixelRatio)
+    effectComposer.setSize(sizes.width, sizes.height)
 })
 
 /**
@@ -132,7 +137,7 @@ const material = new THREE.ShaderMaterial({
 });
 
 let particles = new THREE.Points(geometry, material);
-particles.position.set(0, 0, 70)
+particles.position.set(0, 0, 0)
 particles.frustumCulled = false
 scene.add(particles)
 
@@ -155,6 +160,54 @@ gui.add(material, 'wireframe').name('wireframe')
 gui.add(material, 'transparent').name('transparent')
 
 
+//Post processing
+
+params.threshold = 0;
+params.strength = 1;
+params.radius =  0;
+params.clearColor =  '#000000';
+params.exposure = 1;
+
+
+let effectComposer = new EffectComposer(renderer)
+let renderPass = new RenderPass( scene, camera );
+let outputPass = new OutputPass();
+let bloomPass = new UnrealBloomPass(sizes.width, sizes.height );
+bloomPass.threshold = params.threshold;
+bloomPass.strength = params.strength;
+bloomPass.radius = params.radius;
+        
+
+
+effectComposer.addPass(renderPass) 
+effectComposer.addPass(bloomPass)
+effectComposer.addPass(outputPass)
+
+
+        gui.add( params, 'threshold', 0.0, 3.0 ).onChange( () => {
+            bloomPass.threshold = params.threshold;
+        } );
+        gui.add( params, 'strength', 0.0, 3.0 ).onChange( () =>{
+            bloomPass.strength = params.strength;
+        } );
+        gui.add( params, 'radius', 0.0, 1.0 ).step( 0.01 ).onChange(  () => {
+            bloomPass.radius = params.radius;
+        } );
+        gui.add( params, 'exposure', 0.1, 2 ).onChange(  () => {
+            renderer.toneMappingExposure = Math.pow( params.exposure, 4.0 );
+        } );
+
+        gui.addColor( params, 'clearColor').onChange(  () => {
+            renderer.setClearColor(params.clearColor)
+        } );
+        gui.add( renderer, 'toneMapping',{
+            no: THREE.NoToneMapping,
+            Liner: THREE.LinearToneMapping,
+            Reinhard: THREE.ReinhardToneMapping,
+            Cineon: THREE.CineonToneMapping,
+            ACESFilmic: THREE.ACESFilmicToneMapping,
+            })
+
 
 /**
  * Animate
@@ -172,6 +225,8 @@ const tick = () => {
 
     // Render
     renderer.render(scene, camera)
+    // renderer.clear()
+    effectComposer.render()
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)

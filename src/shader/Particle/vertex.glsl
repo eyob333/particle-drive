@@ -5,7 +5,7 @@ uniform float uSize;
 uniform float uTime;
 uniform float uSpeed;
 
-varying float uStrength;
+varying float vStrength;
 #define max_z 100.
 
 
@@ -22,11 +22,13 @@ void main(){
 
     // newPos.x = newPos.x + sin(+ uTime * uSpeed * .0001);
     vec4 mvPosition = modelViewMatrix * vec4( newPos, 1.);
-    
-    gl_Position = projectionMatrix * mvPosition;
-    gl_PointSize =  (uSize * 10. ) / -mvPosition.z;
+    vStrength = clamp(( mov/max_z), .0, 1.);
+    vStrength = pow(vStrength, 2.);
 
-    uStrength = clamp(( mov/max_z), .0, 1.);
+    gl_Position = projectionMatrix * mvPosition; 
+    gl_PointSize = ( (uSize * 10. ) / -mvPosition.z);
+
+   
 
     // // newPos.x *= sin(uTime * .001);
     // vec4 instancePosition = instanceMatrix * vec4(newPos, 1.0);
