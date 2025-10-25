@@ -26,7 +26,7 @@ void main(){
     gl_Position = projectionMatrix * mvPosition;
     gl_PointSize =  (uSize * 10. ) / -mvPosition.z;
 
-    uStrength =( mov/max_z);
+    uStrength = clamp(( mov/max_z), .0, 1.);
 
     // // newPos.x *= sin(uTime * .001);
     // vec4 instancePosition = instanceMatrix * vec4(newPos, 1.0);

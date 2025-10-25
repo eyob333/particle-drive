@@ -20,10 +20,11 @@ void main(){
     // col *= d;
     // col *= pow(d, .5);
      
-    col = mix( col, uColor, d);
+    // col = mix( col, uColor, d);
     col = mix( col, col * .0,  uStrength);
+    col = vec3(uStrength);
 
-    gl_FragColor = vec4(col, d);
+    gl_FragColor = vec4(col, 1.);
     // gl_FragColor = vec4(0.47, 0.33, 0.24, 1.0);
     // gl_FragColor = vec4(1., .0, .0, 1.);
     #include <tonemapping_fragment>
