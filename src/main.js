@@ -67,8 +67,8 @@ const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     antialias: true
 })
-// renderer.toneMapping = THREE.ACESFilmicToneMapping
-// renderer.toneMappingExposure = 3
+renderer.toneMapping = THREE.ReinhardToneMapping
+renderer.toneMappingExposure = Math.pow(2, 4)
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(sizes.pixelRatio)
 
@@ -86,7 +86,7 @@ params.color = '#619ae5'
 
 let uniforms = {}
 uniforms.uTime = new THREE.Uniform(0)
-uniforms.uSpeed = new THREE.Uniform(.1)
+uniforms.uSpeed = new THREE.Uniform(.27)
 uniforms.uSize = new THREE.Uniform(35.)
 uniforms.uResolution = new THREE.Uniform(new THREE.Vector2(sizes.width, sizes.height))
 uniforms.uColor = new THREE.Uniform(new THREE.Color(params.color))
@@ -130,14 +130,14 @@ const material = new THREE.ShaderMaterial({
     uniforms,
     transparent: true,
     wireframe: false,
-    blending: THREE.AdditiveBlending,
+    blending: THREE.NoBlending,
     depthWrite: false,
-    depthTest: true,
+    depthTest: false,
     opacity: .5
 });
 
 let particles = new THREE.Points(geometry, material);
-particles.position.set(0, 0, 0)
+particles.position.set(0, 0, 10)
 particles.frustumCulled = false
 scene.add(particles)
 
@@ -162,11 +162,11 @@ gui.add(material, 'transparent').name('transparent')
 
 //Post processing
 
-params.threshold = 0;
-params.strength = 1;
-params.radius =  0;
+params.threshold = .07;
+params.strength = .25;
+params.radius =  .83;
 params.clearColor =  '#000000';
-params.exposure = 1;
+params.exposure = 2;
 
 
 let effectComposer = new EffectComposer(renderer)
